@@ -102,9 +102,7 @@ int IsdCmdSend_WriteAGB(IsdDevice *pDev, uint32_t addr, const void *buf, unsigne
 	cmd->header.addr = addr;
 	cmd->header.size = size;
 	memcpy(cmd->data, buf, size);
-
-	//TODO: adjust to use Ex function
-	int status = IsdSendWriteCommand(pDev, cmd);
+	int status = IsdSendWriteCommandEx(pDev, cmd, pResult);
 
 	free(cmd);
 	return 1;
@@ -131,9 +129,7 @@ int IsdCmdSend_WriteSDRAM(IsdDevice *pDev, uint32_t addr, const void *buf, unsig
 	cmd->header.addr = addr;
 	cmd->header.size = size;
 	memcpy(cmd->data, buf, size);
-
-	//TODO: adjust to use Ex function
-	int status = IsdSendWriteCommand(pDev, cmd);
+	int status = IsdSendWriteCommandEx(pDev, cmd, pResult);
 
 	free(cmd);
 	return 1;
