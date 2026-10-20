@@ -87,7 +87,7 @@ int IsdCmdSend_ReadAGB(IsdDevice *pDev, uint32_t addr, uint32_t size, void *buf,
 
 	cmd.addr = addr;
 	cmd.size = size;
-	return IsdSendReadCommand(pDev, &cmd, buf);
+	return IsdSendReadCommandEx(pDev, &cmd, buf, pResult);
 }
 
 int IsdCmdSend_WriteAGB(IsdDevice *pDev, uint32_t addr, const void *buf, unsigned int size, IsdCommandResult *pResult) {
@@ -105,7 +105,7 @@ int IsdCmdSend_WriteAGB(IsdDevice *pDev, uint32_t addr, const void *buf, unsigne
 	int status = IsdSendWriteCommandEx(pDev, cmd, pResult);
 
 	free(cmd);
-	return 1;
+	return status;
 }
 
 int IsdCmdSend_ReadSDRAM(IsdDevice *pDev, uint32_t addr, uint32_t size, void *buf, IsdCommandResult *pResult) {
@@ -114,7 +114,7 @@ int IsdCmdSend_ReadSDRAM(IsdDevice *pDev, uint32_t addr, uint32_t size, void *bu
 
 	cmd.addr = addr;
 	cmd.size = size;
-	return IsdSendReadCommand(pDev, &cmd, buf);
+	return IsdSendReadCommandEx(pDev, &cmd, buf, pResult);
 }
 
 int IsdCmdSend_WriteSDRAM(IsdDevice *pDev, uint32_t addr, const void *buf, unsigned int size, IsdCommandResult *pResult) {
@@ -132,7 +132,7 @@ int IsdCmdSend_WriteSDRAM(IsdDevice *pDev, uint32_t addr, const void *buf, unsig
 	int status = IsdSendWriteCommandEx(pDev, cmd, pResult);
 
 	free(cmd);
-	return 1;
+	return status;
 }
 
 int IsdCmdSend_GetSerial(IsdDevice *pDev, unsigned char *pSerial) {
