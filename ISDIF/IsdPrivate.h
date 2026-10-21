@@ -60,8 +60,8 @@
 #define ISD_IOCTL_RESET_PORT         ISD_CTL(0x0001)  // Resets the USB port if port connected but not enabled. No in, no out.
 #define ISD_IOCTL_RESET_PIPE         ISD_CTL(0x0002)  // Resets the pipe. No in, no out.
 #define ISD_IOCTL_GET_DEVICE_DESC    ISD_CTL(0x0003)  // Returns the USB_DEVICE_DESCRIPTOR
-#define ISD_IOCTL_5                  ISD_CTL(0x0005)  // Returns ULONG: (0, 1, 2, 3) No in.
-#define ISD_IOCTL_6                  ISD_CTL(0x0006)  // Returns ULONG: 0x00020002
+#define ISD_IOCTL_GET_WDM_VERSION    ISD_CTL(0x0005)  // Returns WDM version (3: 1.31+. 1: older. 2 and 0 never returned?). No in, ULONG out.
+#define ISD_IOCTL_6                  ISD_CTL(0x0006)  // Returns ULONG 0x00020002.
 #define ISD_IOCTL_SUBMIT_URB         ISD_CTL(0x0007)  // Submits a URB. URB in, no out.
 #define ISD_IOCTL_SUBMIT_URB_EX      ISD_CTL(0x0008)  // Submits a URB. URB in, response out.
 #define ISD_IOCTL_GET_PORT_STATUS    ISD_CTL(0x000A)  // Returns USB port status. No in, ULONG out.
