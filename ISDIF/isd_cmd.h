@@ -53,22 +53,40 @@
 #define ISDCMD_WRITE_AGB       (ISDCMD_LOC_AGB   | ISDCMD_TYPE_WR)                               // write AGB SRAM
 
 #define ISDCMD_GET_SERIAL      (ISDCMD_TARGET_NEC | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x13)  // get device serial
+#define ISDCMD_GET_FIRM_INFO   (ISDCMD_TARGET_NEC | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x18)  // get firmware info
 
-#define ISDCMD_HARDWARE_RESET  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x01)  // do hardware reset
+#define ISDCMD_HARDWARE_RESET  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x01)  // do hardware reset (byte=1: flush print?)
 #define ISDCMD_START_READ_MEM  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x03)  // read memory from target processor
 #define ISDCMD_WRITE_MEM       (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x04)  // write memory to target processor
 #define ISDCMD_FIQ_LEAVE       (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x05)  // allow FIQ to return
+#define ISDCMD_SET_RST         (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x0A)  // set reset
 #define ISDCMD_SELECT_PROC     (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x0B)  // set current processor
 #define ISDCMD_START_READ_REG  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x20)  // read register from target processor
 #define ISDCMD_SET_FIQ         (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x2A)  // set FIQ raise/lower
+#define ISDCMD_CONFIGURE       (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x2D)  // configure setting on NEC
+#define ISDCMD_RW_ICE_REG      (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x33)  // read/write ICE register
 
 #define ISDCMD_READ_MEM_RESULT (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x01)  // get read memory result
 #define ISDCMD_GET_PRINT_MAINP (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x08)  // get print data ARM9
 #define ISDCMD_GET_PRINT_SUBP  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x09)  // get print data ARM7
+#define ISDCMD_GET_MON_STATUS  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x0B)  // checks monitor status (no poll)
 #define NECCDM_READ_REG_RESULT (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x0C)  // read regs read result
+#define ISDCMD_GET_ICE_WSTAT   (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x18)  // get ICE write status
 #define ISDCMD_WAITMON_FIQ     (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x27)  // wait for FIQ entry
 #define ISDCMD_WAITMON_CMD     (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x28)  // wait for command complete
 
+
+
+// ----- command enumerations
+
+#define ISD_CFG_SHARED_ADDR    0x01  // AGB slot shared address
+#define ISD_CFG_CTRDG_POWER    0x02  // AGB cartridge power setting
+#define ISD_CFG_CTRDG_PROTECT  0x04  // AGB cartridge bus protect
+#define ISD_CFG_CTRDG_EJECT    0x05  // AGB cartridge ejection
+#define ISD_CFG_CARD_ID        0x09  // Nitro card ID setting
+#define ISD_CFG_CARD_POWER     0x0A  // Nitro card power setting
+#define ISD_CFG_CARD_EJECT     0x0D  // Nitro card ejection
+#define ISD_CFG_DBG_BUTTON     0x1D  // debug button simulation
 
 
 
@@ -122,6 +140,12 @@ typedef struct IsdCmdWriteMemBody_ {
 	unsigned char data[];
 } IsdCmdWriteMemBody;
 
+typedef struct IsdCmdConfigureBody_ {
+	uint8_t cmdid;
+	uint32_t id;
+	unsigned char data[0x10];
+} IsdCmdConfigureBody;
+
 
 
 typedef struct IsdCmdWrite_ {
@@ -148,6 +172,11 @@ typedef struct IsdCmdWriteMem_ {
 	IsdCommandHeader   header;
 	IsdCmdWriteMemBody body;
 } IsdCmdWriteMem;
+
+typedef struct IsdCmdConfigure_ {
+	IsdCommandHeader    header;
+	IsdCmdConfigureBody body;
+} IsdCmdConfigure;
 
 
 

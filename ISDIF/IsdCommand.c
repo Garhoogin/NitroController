@@ -159,6 +159,14 @@ int IsdCmdSend_SetFIQ(IsdDevice *pDev, uint16_t flag) {
 	return IsdSendWriteCommand(pDev, &cmd);
 }
 
+int IsdCmdSend_GetMonStatus(IsdDevice *pDev, IsdMonStatus *pStatus) {
+	IsdCommandHeader cmd = { 0 };
+	ISD_INIT_CMD_HDR(cmd, ISDCMD_GET_MON_STATUS);
+
+	cmd.size = sizeof(IsdMonStatus);
+	return IsdSendReadCommand(pDev, &cmd, pStatus);
+}
+
 int IsdCmdSend_WaitMonEntry(IsdDevice *pDev, IsdMonStatus *pStatus) {
 	IsdCommandHeader cmd = { 0 };
 	ISD_INIT_CMD_HDR(cmd, ISDCMD_WAITMON_FIQ);
@@ -217,4 +225,12 @@ int IsdCmdSend_GetReadMemResult(IsdDevice *pDev, void *dest, unsigned int size) 
 
 	cmd.size = size;
 	return IsdSendReadCommand(pDev, &cmd, dest);
+}
+
+int IsdCmdSend_Configure(IsdDevice *pDev, int idx, const void *data, unsigned int size) {
+	IsdCmdConfigure cmd = { 0 };
+	ISD_INIT_CMD(cmd, ISDCMD_CONFIGURE);
+
+	memcpy(cmd.body.data, data, size);
+	return IsdSendWriteCommand(pDev, &cmd);
 }

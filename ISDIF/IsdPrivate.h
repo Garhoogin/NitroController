@@ -136,10 +136,12 @@ int IsdCmdSend_WriteSDRAM(IsdDevice *pDev, uint32_t addr, const void *buf, unsig
 int IsdCmdSend_GetSerial(IsdDevice *pDev, unsigned char *pSerial);
 int IsdCmdSend_SelectProc(IsdDevice *pDev, IsdProc proc);
 int IsdCmdSend_SetFIQ(IsdDevice *pDev, uint16_t flag);
+int IsdCmdSend_GetMonStatus(IsdDevice *pDev, IsdMonStatus *pStatus);
 int IsdCmdSend_WaitMonEntry(IsdDevice *pDev, IsdMonStatus *pStatus);
 int IsdCmdSend_WaitMonCmdComplete(IsdDevice *pDev, IsdMonStatus *pStatus);
 int IsdCmdSend_FiqLeave(IsdDevice *pDev);
 int IsdCmdSend_WriteMem(IsdDevice *pDev, uint32_t dest, const void *buf, unsigned int size);
 int IsdCmdSend_StartReadMem(IsdDevice *pDev, uint32_t addr, unsigned int size);
 int IsdCmdSend_GetReadMemResult(IsdDevice *pDev, void *dest, unsigned int size);
+int IsdCmdSend_Configure(IsdDevice *pDev, int idx, const void *data, unsigned int size);
 
