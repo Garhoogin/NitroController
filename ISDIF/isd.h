@@ -43,7 +43,7 @@
 //
 // Indicates the last error code on the device.
 //
-// Boolean values:
+// Values:
 //   ISD_STATUS_OK               No error occurred.
 //   ISD_STATUS_IRREGULAR        An error occurred that results in the library in an unusable
 //                               state. The library should be terminated.
@@ -75,7 +75,7 @@ typedef enum IsdStatus_ {
 //
 // The Nitro processor cores.
 //
-// Boolean values:
+// Values:
 //   TS_PROC_MAIN                The DS ARM9 processor.
 //   TS_PROC_SUB                 The DS ARM7 processor.
 // -----------------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ typedef enum IsdProc_ {
 //
 // The sharing modes used to access the device.
 //
-// Boolean values:
+// Values:
 //   ISD_SHARE_MODE_EXCLUSIVE    The device is opened with exclusive access for the entire
 //                               duration it is open.
 //   ISD_SHARE_MODE_SHARED       The access to the device is shared. Exclusive access is still
@@ -103,6 +103,27 @@ typedef enum IsdShareMode_ {
 	ISD_SHARE_MODE_SHARED,     // only acquires exclusive access for atomic operations
 	ISD_SHARE_MODE_PASSIVE     // never acquires exclusive access
 } IsdShareMode;
+
+// -----------------------------------------------------------------------------------------------
+// Name: struct IsdMonStatus
+//
+// The status of the monitor program.
+//
+// Values:
+//   proc                        Which processor the monitor status is retrieved for. Use the
+//                               IsdProc enum.
+//   field1                      ?
+//   cmdComplete                 Indicates that the command is complete when nonzero.
+//   fiqEnter                    Indicates the FIQ program is running when nonzero.
+//   monStatus                   ?
+// -----------------------------------------------------------------------------------------------
+typedef struct IsdMonStatus_ {
+	unsigned char proc;             // indicates which processor (0=main, 1=sub)
+	unsigned char field1;
+	unsigned char cmdComplete;      // indicates the command is complete
+	unsigned char fiqEnter;         // indicates the FIQ handler is ready
+	uint32_t monStatus;             // ? (0=in process, 1=complete, 2=unknown?)
+} IsdMonStatus;
 
 typedef struct IsdDevice_ IsdDevice;
 
@@ -262,6 +283,23 @@ ISD_LIB int IsdMonEnter(
 // -----------------------------------------------------------------------------------------------
 ISD_LIB int IsdMonLeave(
 	IsdDevice *pDev
+);
+
+// -----------------------------------------------------------------------------------------------
+// Name: IsdMonGetStatus
+//
+// Gets the current status of the monitor program.
+//
+// Parameters:
+//   pDev          The device handle.
+//   pStatus       The status information, filled in on a successful call.
+//
+// Returns:
+//   Zero on failure, or nonzero on success.
+// -----------------------------------------------------------------------------------------------
+ISD_LIB int IsdMonGetStatus(
+	IsdDevice    *pDev,
+	IsdMonStatus *pStatus
 );
 
 // -----------------------------------------------------------------------------------------------

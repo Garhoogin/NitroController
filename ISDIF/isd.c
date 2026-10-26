@@ -560,6 +560,15 @@ int IsdMonLeave(IsdDevice *pDev) {
 	return status;
 }
 
+int IsdMonGetStatus(IsdDevice *pDev, IsdMonStatus *pStatus) {
+	if (!IsdLockAcquire(pDev)) return 0;
+
+	int status = IsdCmdSend_GetMonStatus(pDev, pStatus);
+
+	(void) IsdLockRelease(pDev);
+	return status;
+}
+
 
 
 // ----- The various read/write routines
