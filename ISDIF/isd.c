@@ -27,8 +27,8 @@
 #include <SetupAPI.h>
 
 #include "isd.h"
-#include "isd_cmd.h"
-#include "IsdPrivate.h"
+#include "NitEmu/isd_cmd.h"
+#include "NitEmu/IsdPrivate.h"
 
 
 

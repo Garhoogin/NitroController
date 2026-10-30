@@ -189,13 +189,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="isd.c" />
-    <ClCompile Include="IsdCommand.c" />
+    <ClCompile Include="NitEmu\IsdCommand.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="isd.h" />
-    <ClInclude Include="IsdPrivate.h" />
-    <ClInclude Include="isd_cmd.h" />
+    <ClInclude Include="NitEmu\IsdPrivate.h" />
+    <ClInclude Include="NitEmu\isd_cmd.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

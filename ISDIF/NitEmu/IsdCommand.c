@@ -23,7 +23,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 // -----------------------------------------------------------------------------------------------
 #include "isd.h"
-#include "isd_cmd.h"
+#include "IsdCommand.h"
 #include "IsdPrivate.h"
 
 #include <Windows.h>

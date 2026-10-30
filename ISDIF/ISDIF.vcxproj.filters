@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\NitEmu">
+      <UniqueIdentifier>{a32849b9-c6dd-434e-93cc-16ce8a9d3458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NitEmu">
+      <UniqueIdentifier>{9c87247b-d4b3-4418-8177-125e0f8a49ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -21,19 +27,19 @@
     <ClCompile Include="isd.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IsdCommand.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="NitEmu\IsdCommand.c">
+      <Filter>Source Files\NitEmu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="isd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="isd_cmd.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NitEmu\isd_cmd.h">
+      <Filter>Header Files\NitEmu</Filter>
     </ClInclude>
-    <ClInclude Include="IsdPrivate.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NitEmu\IsdPrivate.h">
+      <Filter>Header Files\NitEmu</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
