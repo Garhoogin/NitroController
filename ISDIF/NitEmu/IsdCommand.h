@@ -171,8 +171,6 @@ typedef struct IsdCmdConfigure_ {
 } IsdCmdConfigure;
 
 
-
-
 #define ISD_INIT_CMD_HDR(hdr, id) do { \
 	(hdr).header = (id);               \
 	(hdr).addr   = 0;                  \
@@ -190,3 +188,50 @@ typedef struct IsdCmdConfigure_ {
 
 
 
+
+
+// -----------------------------------------------------------------------------------------------
+// Name: struct IsdMonStatusBlock
+//
+// The status of the monitor program.
+//
+// Values:
+//   proc                        Which processor the monitor status is retrieved for. Use the
+//                               IsdProc enum.
+//   field1                      ?
+//   cmdComplete                 Indicates that the command is complete when nonzero.
+//   fiqEnter                    Indicates the FIQ program is running when nonzero.
+//   monStatus                   ?
+// -----------------------------------------------------------------------------------------------
+typedef struct IsdMonStatusBlock_ {
+	unsigned char proc;             // indicates which processor (0=main, 1=sub)
+	unsigned char field1;
+	unsigned char cmdComplete;      // indicates the command is complete
+	unsigned char fiqEnter;         // indicates the FIQ handler is ready
+	uint32_t monStatus;             // ? (0=in process, 1=complete, 2=unknown?)
+} IsdMonStatusBlock;
+
+
+// ----- Command procedures
+
+int IsdSendWriteCommandEx(IsdDevice *pDev, const void *data, IsdCommandResult *pResult);
+int IsdSendReadCommandEx(IsdDevice *pDev, const void *data, void *resp, IsdCommandResult *pResult);
+int IsdSendWriteCommand(IsdDevice *pDev, const void *data);
+int IsdSendReadCommand(IsdDevice *pDev, const void *data, void *resp);
+
+
+int IsdCmdSend_ReadAGB(IsdDevice *pDev, uint32_t addr, uint32_t size, void *buf, IsdCommandResult *pResult);
+int IsdCmdSend_WriteAGB(IsdDevice *pDev, uint32_t addr, const void *buf, unsigned int size, IsdCommandResult *pResult);
+int IsdCmdSend_ReadSDRAM(IsdDevice *pDev, uint32_t addr, uint32_t size, void *buf, IsdCommandResult *pResult);
+int IsdCmdSend_WriteSDRAM(IsdDevice *pDev, uint32_t addr, const void *buf, unsigned int size, IsdCommandResult *pResult);
+int IsdCmdSend_GetSerial(IsdDevice *pDev, unsigned char *pSerial);
+int IsdCmdSend_SelectProc(IsdDevice *pDev, IsdProc proc);
+int IsdCmdSend_SetFIQ(IsdDevice *pDev, uint16_t flag);
+int IsdCmdSend_GetMonStatus(IsdDevice *pDev, IsdMonStatusBlock *pStatus);
+int IsdCmdSend_WaitMonEntry(IsdDevice *pDev, IsdMonStatusBlock *pStatus);
+int IsdCmdSend_WaitMonCmdComplete(IsdDevice *pDev, IsdMonStatusBlock *pStatus);
+int IsdCmdSend_FiqLeave(IsdDevice *pDev);
+int IsdCmdSend_WriteMem(IsdDevice *pDev, uint32_t dest, const void *buf, unsigned int size);
+int IsdCmdSend_StartReadMem(IsdDevice *pDev, uint32_t addr, unsigned int size);
+int IsdCmdSend_GetReadMemResult(IsdDevice *pDev, void *dest, unsigned int size);
+int IsdCmdSend_Configure(IsdDevice *pDev, int idx, const void *data, unsigned int size);

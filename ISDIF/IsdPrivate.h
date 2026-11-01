@@ -35,42 +35,14 @@
 #endif
 
 
-// ----- limits
-
 #define ISD_READ_MAX           0x10000  // max size read at once
 #define ISD_WRITE_MAX          0x10000  // max size write at once
 
-#define ISD_READ_MEM_MAX       0x08000  // TOOD: verify
-#define ISD_WRITE_MEM_MAX      0x02000  // TODO: verify
-#define ISD_READ_AGB_MAX         0x200  // TODO: verify
-#define ISD_WRITE_AGB_MAX        0x200  // TODO: verify
-#define ISD_READ_SDRAM_MAX       0x200  // TODO: verify
-#define ISD_WRITE_SDRAM_MAX      0x200  // TODO: verify
+
+// ----- Defaults
 
 #define ISD_DEFAULT_LOCK_TIMEOUT  2000  // default lock timeout
 #define ISD_DEFAULT_MON_TIMEOUT   2000  // default monitor communication timeout
-
-
-
-// ----- Driver constants
-
-#define ISD_CTL(n) CTL_CODE(FILE_DEVICE_UNKNOWN, n, METHOD_BUFFERED, FILE_ANY_ACCESS)
-
-#define ISD_IOCTL_GET_CONFIG_DESC    ISD_CTL(0x0000)  // Get the USB configuration descriptor
-#define ISD_IOCTL_RESET_PORT         ISD_CTL(0x0001)  // Resets the USB port if port connected but not enabled. No in, no out.
-#define ISD_IOCTL_RESET_PIPE         ISD_CTL(0x0002)  // Resets the pipe. No in, no out.
-#define ISD_IOCTL_GET_DEVICE_DESC    ISD_CTL(0x0003)  // Returns the USB_DEVICE_DESCRIPTOR
-#define ISD_IOCTL_GET_WDM_VERSION    ISD_CTL(0x0005)  // Returns WDM version (3: 1.31+. 1: older. 2 and 0 never returned?). No in, ULONG out.
-#define ISD_IOCTL_6                  ISD_CTL(0x0006)  // Returns ULONG 0x00020002.
-#define ISD_IOCTL_SUBMIT_URB         ISD_CTL(0x0007)  // Submits a URB. URB in, no out.
-#define ISD_IOCTL_SUBMIT_URB_EX      ISD_CTL(0x0008)  // Submits a URB. URB in, response out.
-#define ISD_IOCTL_GET_PORT_STATUS    ISD_CTL(0x000A)  // Returns USB port status. No in, ULONG out.
-
-
-#define ISD_PID   0x0404
-#define ISD_VID   0x0F6E
-
-DEFINE_GUID(ISD_GUID, 0xB78D7ADA, 0xDDF4, 0x418F, 0x8C, 0x7C, 0x4A, 0x0C8, 0x80, 0x30, 0xF5, 0x42);
 
 
 
@@ -93,7 +65,27 @@ typedef struct UsbDeviceDescriptor_ {
 	UCHAR bNumConfigurations;
 } UsbDeviceDescriptor;
 
+typedef struct IsdDeviceVirtual_ {
+	int (*WaitMon_CmdComplete) (IsdDevice *pDev);
+	int (*WaitMon_FiqEntry) (IsdDevice *pDev);
+	int (*MonEnter) (IsdDevice *pDev);
+	int (*MonLeave) (IsdDevice *pDev);
+	int (*MonGetStatus) (IsdDevice *pDev, IsdMonStatus *pStatus);
+
+	int (*GetSerial) (IsdDevice *pDev, unsigned char *pSerial);
+	int (*SelectProc) (IsdDevice *pDev, IsdProc proc);
+
+	int (*ReadMem) (IsdDevice *pDev, void *dest, uint32_t src, size_t size);
+	int (*WriteMem) (IsdDevice *pDev, uint32_t dest, const void *src, size_t size);
+	int (*ReadAGB) (IsdDevice *pDev, void *dest, uint32_t src, size_t size);
+	int (*WriteAGB) (IsdDevice *pDev, uint32_t dest, const void *src, size_t size);
+	int (*ReadEmulation) (IsdDevice *pDev, void *dest, uint32_t src, size_t size);
+	int (*WriteEmulation) (IsdDevice *pDev, uint32_t dest, const void *src, size_t size);
+} IsdDeviceVirtual;
+
 struct IsdDevice_ {
+	const IsdDeviceVirtual *pVtbl;  // virtual table
+
 	HANDLE hDev;                    // handle to the device
 	HANDLE hReadPipe;               // handle to the read pipe
 	HANDLE hWritePipe;              // handle to the write pipe
@@ -113,35 +105,24 @@ struct IsdDevice_ {
 	IsdProc curproc;                // current processor
 
 	int monStart;                   // if the monitor started
-	IsdMonStatus monStatus;         // status of monitor program
 };
 
 
 // ----- private routines on the device
 
+int IsdGetSerialInternal(IsdDevice *pDev, unsigned char *pSerial);
+void IsdStartTimer(IsdDevice *pDev);
+int IsdCheckTimerExpired(IsdDevice *pDev);
+
 int IsdWrite(IsdDevice *pDev, const void *data, unsigned int size);
 int IsdRead(IsdDevice *pDev, void *data, unsigned int size);
 
-int IsdSendWriteCommandEx(IsdDevice *pDev, const void *data, IsdCommandResult *pResult);
-int IsdSendReadCommandEx(IsdDevice *pDev, const void *data, void *resp, IsdCommandResult *pResult);
-int IsdSendWriteCommand(IsdDevice *pDev, const void *data);
-int IsdSendReadCommand(IsdDevice *pDev, const void *data, void *resp);
 
-int IsdGetSerialInternal(IsdDevice *pDev, unsigned char *pSerial);
+// ----- Chunked transfer routines
 
-int IsdCmdSend_ReadAGB(IsdDevice *pDev, uint32_t addr, uint32_t size, void *buf, IsdCommandResult *pResult);
-int IsdCmdSend_WriteAGB(IsdDevice *pDev, uint32_t addr, const void *buf, unsigned int size, IsdCommandResult *pResult);
-int IsdCmdSend_ReadSDRAM(IsdDevice *pDev, uint32_t addr, uint32_t size, void *buf, IsdCommandResult *pResult);
-int IsdCmdSend_WriteSDRAM(IsdDevice *pDev, uint32_t addr, const void *buf, unsigned int size, IsdCommandResult *pResult);
-int IsdCmdSend_GetSerial(IsdDevice *pDev, unsigned char *pSerial);
-int IsdCmdSend_SelectProc(IsdDevice *pDev, IsdProc proc);
-int IsdCmdSend_SetFIQ(IsdDevice *pDev, uint16_t flag);
-int IsdCmdSend_GetMonStatus(IsdDevice *pDev, IsdMonStatus *pStatus);
-int IsdCmdSend_WaitMonEntry(IsdDevice *pDev, IsdMonStatus *pStatus);
-int IsdCmdSend_WaitMonCmdComplete(IsdDevice *pDev, IsdMonStatus *pStatus);
-int IsdCmdSend_FiqLeave(IsdDevice *pDev);
-int IsdCmdSend_WriteMem(IsdDevice *pDev, uint32_t dest, const void *buf, unsigned int size);
-int IsdCmdSend_StartReadMem(IsdDevice *pDev, uint32_t addr, unsigned int size);
-int IsdCmdSend_GetReadMemResult(IsdDevice *pDev, void *dest, unsigned int size);
-int IsdCmdSend_Configure(IsdDevice *pDev, int idx, const void *data, unsigned int size);
+typedef int (*IsdWriteRoutine) (IsdDevice *pDev, uint32_t addr, const void *p, size_t size);
+typedef int (*IsdReadRoutine) (IsdDevice *pDev, uint32_t addr, void *p, size_t size);
+
+int IsdWriteByFuncp(IsdDevice *pDev, uint32_t dest, const void *src, size_t size, IsdWriteRoutine funcp, size_t maxBlock);
+int IsdReadByFuncp(IsdDevice *pDev, void *dest, uint32_t src, size_t size, IsdReadRoutine funcp, size_t maxBlock);
 

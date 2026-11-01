@@ -99,6 +99,7 @@
       </PrecompiledHeaderFile>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -150,6 +151,7 @@
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -189,13 +191,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="isd.c" />
+    <ClCompile Include="NitEmu\NitEmu.c" />
     <ClCompile Include="NitEmu\IsdCommand.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="isd.h" />
-    <ClInclude Include="NitEmu\IsdPrivate.h" />
-    <ClInclude Include="NitEmu\isd_cmd.h" />
+    <ClInclude Include="IsdPrivate.h" />
+    <ClInclude Include="NitEmu\NitEmu.h" />
+    <ClInclude Include="NitEmu\IsdCommand.h" />
+    <ClInclude Include="NitEmu\NitEmuPrivate.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

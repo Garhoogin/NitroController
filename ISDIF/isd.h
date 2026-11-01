@@ -63,6 +63,7 @@
 typedef enum IsdStatus_ {
 	ISD_STATUS_OK,             // No error.
 	ISD_STATUS_IRREGULAR,      // The state is irregular. The library should be terminated.
+	ISD_STATUS_UNSUPPORTED,    // The operation is not supported.
 	ISD_STATUS_BUSY,           // Exclusive access could not be acquired. Try again or use a lesser access.
 	ISD_STATUS_NOMEM,          // Insufficient memory to complete the operation. Recoverable error.
 	ISD_STATUS_COMM_CLOSE,     // The communication is closed unexpectedly. Try reconnecting.
@@ -110,19 +111,14 @@ typedef enum IsdShareMode_ {
 // The status of the monitor program.
 //
 // Values:
-//   proc                        Which processor the monitor status is retrieved for. Use the
-//                               IsdProc enum.
-//   field1                      ?
+//   proc                        Which processor the monitor status is retrieved for.
 //   cmdComplete                 Indicates that the command is complete when nonzero.
 //   fiqEnter                    Indicates the FIQ program is running when nonzero.
-//   monStatus                   ?
 // -----------------------------------------------------------------------------------------------
 typedef struct IsdMonStatus_ {
-	unsigned char proc;             // indicates which processor (0=main, 1=sub)
-	unsigned char field1;
-	unsigned char cmdComplete;      // indicates the command is complete
-	unsigned char fiqEnter;         // indicates the FIQ handler is ready
-	uint32_t monStatus;             // ? (0=in process, 1=complete, 2=unknown?)
+	IsdProc proc;
+	unsigned char cmdComplete;
+	unsigned char fiqEnter;
 } IsdMonStatus;
 
 typedef struct IsdDevice_ IsdDevice;

@@ -30,15 +30,24 @@
     <ClCompile Include="NitEmu\IsdCommand.c">
       <Filter>Source Files\NitEmu</Filter>
     </ClCompile>
+    <ClCompile Include="NitEmu\NitEmu.c">
+      <Filter>Source Files\NitEmu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="isd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NitEmu\isd_cmd.h">
+    <ClInclude Include="NitEmu\IsdCommand.h">
       <Filter>Header Files\NitEmu</Filter>
     </ClInclude>
-    <ClInclude Include="NitEmu\IsdPrivate.h">
+    <ClInclude Include="IsdPrivate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NitEmu\NitEmu.h">
+      <Filter>Header Files\NitEmu</Filter>
+    </ClInclude>
+    <ClInclude Include="NitEmu\NitEmuPrivate.h">
       <Filter>Header Files\NitEmu</Filter>
     </ClInclude>
   </ItemGroup>

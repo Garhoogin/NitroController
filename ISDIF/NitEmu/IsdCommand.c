@@ -159,27 +159,27 @@ int IsdCmdSend_SetFIQ(IsdDevice *pDev, uint16_t flag) {
 	return IsdSendWriteCommand(pDev, &cmd);
 }
 
-int IsdCmdSend_GetMonStatus(IsdDevice *pDev, IsdMonStatus *pStatus) {
+int IsdCmdSend_GetMonStatus(IsdDevice *pDev, IsdMonStatusBlock *pStatus) {
 	IsdCommandHeader cmd = { 0 };
 	ISD_INIT_CMD_HDR(cmd, ISDCMD_GET_MON_STATUS);
 
-	cmd.size = sizeof(IsdMonStatus);
+	cmd.size = sizeof(IsdMonStatusBlock);
 	return IsdSendReadCommand(pDev, &cmd, pStatus);
 }
 
-int IsdCmdSend_WaitMonEntry(IsdDevice *pDev, IsdMonStatus *pStatus) {
+int IsdCmdSend_WaitMonEntry(IsdDevice *pDev, IsdMonStatusBlock *pStatus) {
 	IsdCommandHeader cmd = { 0 };
 	ISD_INIT_CMD_HDR(cmd, ISDCMD_WAITMON_FIQ);
 
-	cmd.size = sizeof(IsdMonStatus);
+	cmd.size = sizeof(IsdMonStatusBlock);
 	return IsdSendReadCommand(pDev, &cmd, pStatus);
 }
 
-int IsdCmdSend_WaitMonCmdComplete(IsdDevice *pDev, IsdMonStatus *pStatus) {
+int IsdCmdSend_WaitMonCmdComplete(IsdDevice *pDev, IsdMonStatusBlock *pStatus) {
 	IsdCommandHeader cmd = { 0 };
 	ISD_INIT_CMD_HDR(cmd, ISDCMD_WAITMON_CMD);
 
-	cmd.size = sizeof(IsdMonStatus);
+	cmd.size = sizeof(IsdMonStatusBlock);
 	return IsdSendReadCommand(pDev, &cmd, pStatus);
 }
 
