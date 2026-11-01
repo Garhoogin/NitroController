@@ -341,7 +341,7 @@ int IsdSelectProc(IsdDevice *pDev, IsdProc proc) {
 	int status = IsdSelectProc_NoLock(pDev, proc);
 
 	(void) IsdLockRelease(pDev);
-	return 1;
+	return status;
 }
 
 

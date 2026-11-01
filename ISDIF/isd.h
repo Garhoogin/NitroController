@@ -47,6 +47,7 @@
 //   ISD_STATUS_OK               No error occurred.
 //   ISD_STATUS_IRREGULAR        An error occurred that results in the library in an unusable
 //                               state. The library should be terminated.
+//   ISD_STATUS_UNSUPPORTED      The operation is not supported.
 //   ISD_STATUS_BUSY             Exclusive access to the device could not be acquired. The
 //                               device may be being used by another process. Try again or use a
 //                               lesser access.

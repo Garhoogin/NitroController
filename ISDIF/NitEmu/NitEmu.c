@@ -49,7 +49,7 @@ static int Isd_NitEmu_WriteAGB(IsdDevice *pDev, uint32_t dest, const void *src, 
 static int Isd_NitEmu_ReadEmulation(IsdDevice *pDev, void *dest, uint32_t src, size_t size);
 static int Isd_NitEmu_WriteEmulation(IsdDevice *pDev, uint32_t dest, const void *src, size_t size);
 
-IsdDeviceVirtual sVtbl = {
+static const IsdDeviceVirtual sVtbl = {
 	Isd_NitEmu_WaitMon_CmdComplete,
 	Isd_NitEmu_WaitMon_FiqEntry,
 	Isd_NitEmu_MonEnter,
@@ -144,6 +144,8 @@ IsdDevice *IsdOpen_NitEmuInternal(const wchar_t *devPath, IsdShareMode shareMode
 	if (!b || dwBytesReturned < sizeof(desc)) goto Error;
 	if (desc.idVendor != ISD_VID || desc.idProduct != ISD_PID) goto Error;
 
+	return pDev;
+
 Error:
 	if (pDev != NULL) IsdClose(pDev);
 	return NULL;
@@ -223,7 +225,7 @@ static void IsdConvertStatus(IsdMonStatus *pStatus, const IsdMonStatusBlock *pSt
 	pStatus->cmdComplete = pStatusBlock->cmdComplete;
 }
 
-int Isd_NitEmu_WaitMon_CmdComplete(IsdDevice *pDev) {
+static int Isd_NitEmu_WaitMon_CmdComplete(IsdDevice *pDev) {
 	IsdStartTimer(pDev);
 
 	IsdMonStatusBlock monStatus;
@@ -238,7 +240,7 @@ int Isd_NitEmu_WaitMon_CmdComplete(IsdDevice *pDev) {
 	}
 }
 
-int Isd_NitEmu_WaitMon_FiqEntry(IsdDevice *pDev) {
+static int Isd_NitEmu_WaitMon_FiqEntry(IsdDevice *pDev) {
 	IsdStartTimer(pDev);
 
 	IsdMonStatusBlock monStatus;
@@ -253,7 +255,7 @@ int Isd_NitEmu_WaitMon_FiqEntry(IsdDevice *pDev) {
 	}
 }
 
-int Isd_NitEmu_MonEnter(IsdDevice *pDev) {
+static int Isd_NitEmu_MonEnter(IsdDevice *pDev) {
 	if (!IsdRaiseFIQ(pDev)) return 0;
 
 	int status = Isd_NitEmu_WaitMon_FiqEntry(pDev);
@@ -263,7 +265,7 @@ int Isd_NitEmu_MonEnter(IsdDevice *pDev) {
 	return status;
 }
 
-int Isd_NitEmu_MonLeave(IsdDevice *pDev) {
+static int Isd_NitEmu_MonLeave(IsdDevice *pDev) {
 	if (!Isd_NitEmu_WaitMon_CmdComplete(pDev)) return 0;
 
 	if (!IsdCmdSend_FiqLeave(pDev)) return 0;
@@ -273,7 +275,7 @@ int Isd_NitEmu_MonLeave(IsdDevice *pDev) {
 	return 1;
 }
 
-int Isd_NitEmu_MonGetStatus(IsdDevice *pDev, IsdMonStatus *pStatus) {
+static int Isd_NitEmu_MonGetStatus(IsdDevice *pDev, IsdMonStatus *pStatus) {
 	IsdMonStatusBlock statusBlock;
 	if (!IsdCmdSend_GetMonStatus(pDev, &statusBlock)) return 0;
 
@@ -285,11 +287,11 @@ int Isd_NitEmu_MonGetStatus(IsdDevice *pDev, IsdMonStatus *pStatus) {
 
 // ----- General routines
 
-int Isd_NitEmu_GetSerial(IsdDevice *pDev, unsigned char *pSerial) {
+static int Isd_NitEmu_GetSerial(IsdDevice *pDev, unsigned char *pSerial) {
 	return IsdCmdSend_GetSerial(pDev, pSerial);
 }
 
-int Isd_NitEmu_SelectProc(IsdDevice *pDev, IsdProc proc) {
+static int Isd_NitEmu_SelectProc(IsdDevice *pDev, IsdProc proc) {
 	if (!IsdCmdSend_SelectProc(pDev, proc)) return 0;
 
 	pDev->curproc = proc;
@@ -304,7 +306,7 @@ static int IsdReadMem_Proc(IsdDevice *pDev, uint32_t addr, void *p, size_t size)
 	return IsdReadMemChunk(pDev, addr, p, size);
 }
 
-int Isd_NitEmu_ReadMem(IsdDevice *pDev, void *dest, uint32_t src, size_t size) {
+static int Isd_NitEmu_ReadMem(IsdDevice *pDev, void *dest, uint32_t src, size_t size) {
 	return IsdReadByFuncp(pDev, dest, src, size, IsdReadMem_Proc, ISD_READ_MEM_MAX);
 }
 
@@ -317,7 +319,7 @@ static int IsdWriteMem_Proc(IsdDevice *pDev, uint32_t addr, const void *p, size_
 	return 1;
 }
 
-int Isd_NitEmu_WriteMem(IsdDevice *pDev, uint32_t dest, const void *src, size_t size) {
+static int Isd_NitEmu_WriteMem(IsdDevice *pDev, uint32_t dest, const void *src, size_t size) {
 	return IsdWriteByFuncp(pDev, dest, src, size, IsdWriteMem_Proc, ISD_WRITE_MEM_MAX);
 }
 
@@ -336,7 +338,7 @@ static int IsdReadAGB_Proc(IsdDevice *pDev, uint32_t addr, void *buf, size_t siz
 	return 1;
 }
 
-int Isd_NitEmu_ReadAGB(IsdDevice *pDev, void *dest, uint32_t src, size_t size) {
+static int Isd_NitEmu_ReadAGB(IsdDevice *pDev, void *dest, uint32_t src, size_t size) {
 	return IsdReadByFuncp(pDev, dest, src, size, IsdReadAGB_Proc, ISD_READ_AGB_MAX);
 }
 
@@ -356,7 +358,7 @@ static int IsdWriteAGB_Proc(IsdDevice *pDev, uint32_t addr, const void *buf, siz
 	return 1;
 }
 
-int Isd_NitEmu_WriteAGB(IsdDevice *pDev, uint32_t dest, const void *src, size_t size) {
+static int Isd_NitEmu_WriteAGB(IsdDevice *pDev, uint32_t dest, const void *src, size_t size) {
 	return IsdWriteByFuncp(pDev, dest, src, size, IsdWriteAGB_Proc, ISD_WRITE_AGB_MAX);
 }
 
@@ -375,7 +377,7 @@ static int IsdReadEmulation_Proc(IsdDevice *pDev, uint32_t addr, void *buf, size
 	return 1;
 }
 
-int Isd_NitEmu_ReadEmulation(IsdDevice *pDev, void *dest, uint32_t src, size_t size) {
+static int Isd_NitEmu_ReadEmulation(IsdDevice *pDev, void *dest, uint32_t src, size_t size) {
 	return IsdReadByFuncp(pDev, dest, src, size, IsdReadEmulation_Proc, ISD_READ_SDRAM_MAX);
 }
 
@@ -394,6 +396,6 @@ static int IsdWriteEmulation_Proc(IsdDevice *pDev, uint32_t addr, const void *bu
 	return 1;
 }
 
-int Isd_NitEmu_WriteEmulation(IsdDevice *pDev, uint32_t dest, const void *src, size_t size) {
+static int Isd_NitEmu_WriteEmulation(IsdDevice *pDev, uint32_t dest, const void *src, size_t size) {
 	return IsdWriteByFuncp(pDev, dest, src, size, IsdWriteEmulation_Proc, ISD_WRITE_SDRAM_MAX);
 }
