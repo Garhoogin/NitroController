@@ -133,16 +133,16 @@ IsdDevice *IsdOpen_NitEmuInternal(const wchar_t *devPath, IsdShareMode shareMode
 
 	//checking the USB device descriptor
 	DWORD dwBytesReturned;
-	UsbDeviceDescriptor desc = { 0 };
+	ISUsbDeviceDescriptor desc = { 0 };
 	BOOL b = DeviceIoControl(pDev->hDev,
-		ISD_IOCTL_GET_DEVICE_DESC,
+		ISUSB_IOCTL_GET_DEVICE_DESCRIPTOR,
 		&desc, sizeof(desc),
 		&desc, sizeof(desc),
 		&dwBytesReturned, NULL);
 
 	//checking the USB device descriptor
 	if (!b || dwBytesReturned < sizeof(desc)) goto Error;
-	if (desc.idVendor != ISD_VID || desc.idProduct != ISD_PID) goto Error;
+	if (desc.idVendor != ISUSB_VENDOR_INTSYS || desc.idProduct != ISD_PID_IS_NITRO_EMULATOR) goto Error;
 
 	return pDev;
 
@@ -159,12 +159,12 @@ IsdDevice *IsdOpen_NitEmu(const wchar_t *devPath, IsdShareMode shareMode) {
 	DWORD requiredSize = 0, memberIndex = 0;
 	IsdDevice *pDev = NULL;
 
-	HDEVINFO hDevInfo = SetupDiGetClassDevs(&ISD_GUID, NULL, NULL, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
+	HDEVINFO hDevInfo = SetupDiGetClassDevs(&ISUSB_INTERFACE_GUID, NULL, NULL, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
 	if (hDevInfo == INVALID_HANDLE_VALUE) return NULL;
 
 	while (pDev == NULL) {
 		deviceInterfaceData.cbSize = sizeof(deviceInterfaceData);
-		if (!SetupDiEnumDeviceInterfaces(hDevInfo, NULL, &ISD_GUID, memberIndex++, &deviceInterfaceData)) break;
+		if (!SetupDiEnumDeviceInterfaces(hDevInfo, NULL, &ISUSB_INTERFACE_GUID, memberIndex++, &deviceInterfaceData)) break;
 
 		//query required size
 		if (!SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, NULL, 0, &requiredSize, NULL)) {

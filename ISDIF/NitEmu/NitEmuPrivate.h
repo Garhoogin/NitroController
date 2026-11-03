@@ -25,6 +25,9 @@
 #pragma once
 #include <Windows.h>
 
+#include "ISUSB/IsUsb.h"
+
+
 #define ISD_READ_MEM_MAX       0x08000  // TOOD: verify
 #define ISD_WRITE_MEM_MAX      0x02000  // TODO: verify
 #define ISD_READ_AGB_MAX         0x200  // TODO: verify
@@ -34,25 +37,7 @@
 
 
 
-// ----- IO Control Codes
-
-#define ISD_CTL(n) CTL_CODE(FILE_DEVICE_UNKNOWN, n, METHOD_BUFFERED, FILE_ANY_ACCESS)
-
-#define ISD_IOCTL_GET_CONFIG_DESC    ISD_CTL(0x0000)  // Get the USB configuration descriptor
-#define ISD_IOCTL_RESET_PORT         ISD_CTL(0x0001)  // Resets the USB port if port connected but not enabled. No in, no out.
-#define ISD_IOCTL_RESET_PIPE         ISD_CTL(0x0002)  // Resets the pipe. No in, no out.
-#define ISD_IOCTL_GET_DEVICE_DESC    ISD_CTL(0x0003)  // Returns the USB_DEVICE_DESCRIPTOR
-#define ISD_IOCTL_GET_WDM_VERSION    ISD_CTL(0x0005)  // Returns WDM version (3: 1.31+. 1: older. 2 and 0 never returned?). No in, ULONG out.
-#define ISD_IOCTL_6                  ISD_CTL(0x0006)  // Returns ULONG 0x00020002.
-#define ISD_IOCTL_SUBMIT_URB         ISD_CTL(0x0007)  // Submits a URB. URB in, no out.
-#define ISD_IOCTL_SUBMIT_URB_EX      ISD_CTL(0x0008)  // Submits a URB. URB in, response out.
-#define ISD_IOCTL_GET_PORT_STATUS    ISD_CTL(0x000A)  // Returns USB port status. No in, ULONG out.
-
-
 // ----- Device info
 
-DEFINE_GUID(ISD_GUID, 0xB78D7ADA, 0xDDF4, 0x418F, 0x8C, 0x7C, 0x4A, 0x0C8, 0x80, 0x30, 0xF5, 0x42);
-
-#define ISD_PID   0x0404
-#define ISD_VID   0x0F6E
+#define ISD_PID_IS_NITRO_EMULATOR   0x0404
 

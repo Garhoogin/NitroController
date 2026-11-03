@@ -198,6 +198,7 @@
   <ItemGroup>
     <ClInclude Include="isd.h" />
     <ClInclude Include="IsdPrivate.h" />
+    <ClInclude Include="ISUSB\IsUsb.h" />
     <ClInclude Include="NitEmu\NitEmu.h" />
     <ClInclude Include="NitEmu\IsdCommand.h" />
     <ClInclude Include="NitEmu\NitEmuPrivate.h" />

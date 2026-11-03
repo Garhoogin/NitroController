@@ -46,24 +46,6 @@
 
 
 
-// ----- Driver structures
-
-typedef struct UsbDeviceDescriptor_ {
-	UCHAR bLength;
-	UCHAR bDescriptorType;
-	USHORT bcdUSB;
-	UCHAR bDeviceClass;
-	UCHAR bDeviceSubClass;
-	UCHAR bDeviceProtocol;
-	UCHAR bMaxPacketSize0;
-	USHORT idVendor;
-	USHORT idProduct;
-	USHORT bcdDevice;
-	UCHAR iManufacturer;
-	UCHAR iProduct;
-	UCHAR iSerialNumber;
-	UCHAR bNumConfigurations;
-} UsbDeviceDescriptor;
 
 typedef struct IsdDeviceVirtual_ {
 	int (*WaitMon_CmdComplete) (IsdDevice *pDev);
