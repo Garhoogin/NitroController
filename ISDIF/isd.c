@@ -155,16 +155,7 @@ Error:
 
 void IsdClose(IsdDevice *pDev) {
 	IsdMutRelease(pDev);
-
-	if (pDev->hDev != INVALID_HANDLE_VALUE && pDev->hDev != NULL) {
-		CloseHandle(pDev->hDev);
-	}
-	if (pDev->hWritePipe != INVALID_HANDLE_VALUE && pDev->hWritePipe != NULL) {
-		CloseHandle(pDev->hWritePipe);
-	}
-	if (pDev->hReadPipe != INVALID_HANDLE_VALUE && pDev->hReadPipe != NULL) {
-		CloseHandle(pDev->hReadPipe);
-	}
+	ISUsbDeviceClose(&pDev->usb);
 
 	if (pDev->hMutex != NULL) CloseHandle(pDev->hMutex);
 
@@ -229,44 +220,20 @@ void IsdGetSerial(IsdDevice *pDev, char *out) {
 // ----- Device IO routines
 
 int IsdWrite(IsdDevice *pDev, const void *data, unsigned int size) {
-	while (size > 0) {
-		unsigned int nChunk = size;
-		if (nChunk > ISD_WRITE_MAX) nChunk = ISD_WRITE_MAX;
-
-		//can't use IO timeout, not supported by driver
-		DWORD nWritten;
-		BOOL res = WriteFile(pDev->hWritePipe, data, nChunk, &nWritten, NULL);
-
-		if (!res || nWritten == 0) {
-			//transfer fail
-			pDev->status = ISD_STATUS_COMM_CLOSE;
-			return 0;
-		}
-		
-		size -= nWritten;
-		data = (const unsigned char *) data + nWritten;
+	if (!ISUsbDeviceWrite(&pDev->usb, data, size)) {
+		//transfer fail
+		pDev->status = ISD_STATUS_COMM_CLOSE;
+		return 0;
 	}
 
 	return 1;  // success
 }
 
 int IsdRead(IsdDevice *pDev, void *out, unsigned int size) {
-	while (size > 0) {
-		unsigned int nChunk = size;
-		if (nChunk > ISD_READ_MAX) nChunk = ISD_READ_MAX;
-
-		//can't use IO timeout, not supported by driver
-		DWORD nRead;
-		BOOL res = ReadFile(pDev->hReadPipe, out, nChunk, &nRead, NULL);
-
-		if (!res || nRead == 0) {
-			//transfer fail
-			pDev->status = ISD_STATUS_COMM_CLOSE;
-			return 0;
-		}
-
-		size -= nRead;
-		out = (unsigned char *) out + nRead;
+	if (!ISUsbDeviceRead(&pDev->usb, out, size)) {
+		//transfer fail
+		pDev->status = ISD_STATUS_COMM_CLOSE;
+		return 0;
 	}
 
 	return 1;  // success

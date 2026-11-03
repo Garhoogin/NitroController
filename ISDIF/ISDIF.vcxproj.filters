@@ -19,6 +19,12 @@
     <Filter Include="Header Files\NitEmu">
       <UniqueIdentifier>{9c87247b-d4b3-4418-8177-125e0f8a49ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ISUSB">
+      <UniqueIdentifier>{73ba2716-eaa9-4b18-8a18-76e1ca40877f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ISUSB">
+      <UniqueIdentifier>{c5c323eb-b6aa-4791-b998-df5842df55c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -32,6 +38,9 @@
     </ClCompile>
     <ClCompile Include="NitEmu\NitEmu.c">
       <Filter>Source Files\NitEmu</Filter>
+    </ClCompile>
+    <ClCompile Include="ISUSB\IsUsb.c">
+      <Filter>Source Files\ISUSB</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -51,7 +60,7 @@
       <Filter>Header Files\NitEmu</Filter>
     </ClInclude>
     <ClInclude Include="ISUSB\IsUsb.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\ISUSB</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

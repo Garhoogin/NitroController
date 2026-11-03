@@ -27,6 +27,8 @@
 #include <Windows.h>
 #include <stdint.h>
 
+#include "ISUSB/IsUsb.h"
+
 
 #ifdef _DEBUG
 #define ISD_ASSERT(x)   do { if (!(x)) __debugbreak(); } while (0)
@@ -34,9 +36,6 @@
 #define ISD_ASSERT(x)   __assume(x)
 #endif
 
-
-#define ISD_READ_MAX           0x10000  // max size read at once
-#define ISD_WRITE_MAX          0x10000  // max size write at once
 
 
 // ----- Defaults
@@ -67,10 +66,9 @@ typedef struct IsdDeviceVirtual_ {
 
 struct IsdDevice_ {
 	const IsdDeviceVirtual *pVtbl;  // virtual table
+	
+	ISUsbDevice usb;                // USB device
 
-	HANDLE hDev;                    // handle to the device
-	HANDLE hReadPipe;               // handle to the read pipe
-	HANDLE hWritePipe;              // handle to the write pipe
 	char serial[ISD_SERIAL_SIZE];   // device serial
 
 	IsdShareMode shareMode;         // the device sharing mode

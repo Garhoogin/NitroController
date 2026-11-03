@@ -67,6 +67,8 @@ static const IsdDeviceVirtual sVtbl = {
 
 
 
+
+
 static wchar_t *PathCat(const wchar_t *str1, const wchar_t *str2) {
 	size_t len1 = wcslen(str1), len2 = wcslen(str2);
 	wchar_t *buf = (wchar_t *) malloc((len1 + len2 + 1) * sizeof(wchar_t));
@@ -84,64 +86,24 @@ IsdDevice *IsdOpen_NitEmuInternal(const wchar_t *devPath, IsdShareMode shareMode
 	pDev->pVtbl = &sVtbl;
 	pDev->status = ISD_STATUS_OK;
 	pDev->shareMode = shareMode;
+	pDev->hMutex = NULL;
 
-	wchar_t *pipe00 = PathCat(devPath, L"\\Pipe00");
-	wchar_t *pipe01 = PathCat(devPath, L"\\Pipe01");
-	wchar_t *mutexPath = PathCat(L"Global@ISU_", devPath + 4);
-
-	//main device handle
-	pDev->hDev = INVALID_HANDLE_VALUE;
-	if (devPath != NULL) {
-		pDev->hDev = CreateFile(devPath,
-			GENERIC_READ | GENERIC_WRITE,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			NULL, OPEN_EXISTING, 0, NULL);
-	}
-
-	//write pipe end
-	pDev->hWritePipe = INVALID_HANDLE_VALUE;
-	if (pipe00 != NULL) {
-		pDev->hWritePipe = CreateFile(pipe00,
-			GENERIC_READ | GENERIC_WRITE,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			NULL, OPEN_EXISTING, 0, NULL);
-		free(pipe00);
-	}
-
-	//read pipe end
-	pDev->hReadPipe = INVALID_HANDLE_VALUE;
-	if (pipe01 != NULL) {
-		pDev->hReadPipe = CreateFile(pipe01,
-			GENERIC_READ | GENERIC_WRITE,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			NULL, OPEN_EXISTING, 0, NULL);
-		free(pipe01);
-	}
+	int status = ISUsbDeviceOpen(&pDev->usb, devPath);
+	if (!status) goto Error;
 
 	//shared mutex
-	pDev->hMutex = NULL;
-	if (mutexPath != NULL) {
-		pDev->hMutex = CreateMutex(NULL, FALSE, mutexPath);
-		free(mutexPath);
-	}
+	wchar_t *mutexPath = PathCat(L"Global@ISU_", devPath + 4);
+	if (mutexPath != NULL) pDev->hMutex = CreateMutex(NULL, FALSE, mutexPath);
+	free(mutexPath);
 
 	//checking our device handles opened correctly
-	if (pDev->hDev       == INVALID_HANDLE_VALUE) goto Error;
-	if (pDev->hReadPipe  == INVALID_HANDLE_VALUE) goto Error;
-	if (pDev->hWritePipe == INVALID_HANDLE_VALUE) goto Error;
-	if (pDev->hMutex     ==                 NULL) goto Error;
+	if (pDev->hMutex == NULL) goto Error;
 
 	//checking the USB device descriptor
-	DWORD dwBytesReturned;
-	ISUsbDeviceDescriptor desc = { 0 };
-	BOOL b = DeviceIoControl(pDev->hDev,
-		ISUSB_IOCTL_GET_DEVICE_DESCRIPTOR,
-		&desc, sizeof(desc),
-		&desc, sizeof(desc),
-		&dwBytesReturned, NULL);
+	ISUsbDeviceDescriptor desc;
+	if (!ISUsbDeviceGetDeviceDescriptor(&pDev->usb, &desc)) goto Error;
 
 	//checking the USB device descriptor
-	if (!b || dwBytesReturned < sizeof(desc)) goto Error;
 	if (desc.idVendor != ISUSB_VENDOR_INTSYS || desc.idProduct != ISD_PID_IS_NITRO_EMULATOR) goto Error;
 
 	return pDev;

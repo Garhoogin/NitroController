@@ -191,6 +191,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="isd.c" />
+    <ClCompile Include="ISUSB\IsUsb.c" />
     <ClCompile Include="NitEmu\NitEmu.c" />
     <ClCompile Include="NitEmu\IsdCommand.c" />
     <ClCompile Include="main.c" />

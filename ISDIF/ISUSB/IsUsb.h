@@ -50,6 +50,17 @@
 // -----------------------------------------------------------------------------------------------
 
 
+typedef struct ISUsbDevice_ {
+	HANDLE hDev;
+	HANDLE hRead;
+	HANDLE hWrite;
+} ISUsbDevice;
+
+
+#define ISUSB_READ_MAX           0x10000  // max size read at once
+#define ISUSB_WRITE_MAX          0x10000  // max size write at once
+
+
 // ----- driver interface GUID
 
 DEFINE_GUID(ISUSB_INTERFACE_GUID, 0xB78D7ADA, 0xDDF4, 0x418F, 0x8C, 0x7C, 0x4A, 0xC8, 0x80, 0x30, 0xF5, 0x42);
@@ -218,3 +229,11 @@ typedef struct ISUsbDeviceDescriptor_ {
 	uint8_t  iSerialNumber;
 	uint8_t  bNumConfigurations;
 } ISUsbDeviceDescriptor;
+
+
+
+int ISUsbDeviceOpen(ISUsbDevice *pDev, const wchar_t *path);
+int ISUsbDeviceClose(ISUsbDevice *pDev);
+int ISUsbDeviceWrite(ISUsbDevice *pDev, const void *buf, unsigned int size);
+int ISUsbDeviceRead(ISUsbDevice *pDev, void *buf, unsigned int size);
+int ISUsbDeviceGetDeviceDescriptor(ISUsbDevice *pDev, ISUsbDeviceDescriptor *pDesc);
