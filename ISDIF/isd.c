@@ -29,6 +29,7 @@
 #include "isd.h"
 #include "IsdPrivate.h"
 #include "NitEmu/NitEmu.h"
+#include "TwlDbg/TwlDbg.h"
 
 
 
@@ -130,8 +131,12 @@ void IsdSetLockTimeout(IsdDevice *pDev, unsigned int ms) {
 
 
 IsdDevice *IsdOpen(const wchar_t *devPath, IsdShareMode shareMode) {
+	//TODO: user specified device to open
 	IsdDevice *pDev = IsdOpen_NitEmu(devPath, shareMode);
-	if (pDev == NULL) return NULL;
+	if (pDev == NULL) {
+		pDev = IsdOpen_TwlDbg(devPath, shareMode);
+		if (pDev == NULL) return NULL;
+	}
 
 	//init timer
 	if (!QueryPerformanceFrequency(&pDev->timerFreq)) goto Error;

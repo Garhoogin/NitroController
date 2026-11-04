@@ -25,6 +25,12 @@
     <Filter Include="Source Files\ISUSB">
       <UniqueIdentifier>{c5c323eb-b6aa-4791-b998-df5842df55c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\TwlDbg">
+      <UniqueIdentifier>{717c35b4-f314-4984-9001-b513ff8fe58a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TwlDbg">
+      <UniqueIdentifier>{3ea25d49-c98f-4257-88c8-67fa45e8ad0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -41,6 +47,9 @@
     </ClCompile>
     <ClCompile Include="ISUSB\IsUsb.c">
       <Filter>Source Files\ISUSB</Filter>
+    </ClCompile>
+    <ClCompile Include="TwlDbg\TwlDbg.c">
+      <Filter>Source Files\TwlDbg</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="ISUSB\IsUsbPrivate.h">
       <Filter>Header Files\ISUSB</Filter>
+    </ClInclude>
+    <ClInclude Include="TwlDbg\TwlDbg.h">
+      <Filter>Header Files\TwlDbg</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

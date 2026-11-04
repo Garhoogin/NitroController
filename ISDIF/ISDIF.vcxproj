@@ -195,6 +195,7 @@
     <ClCompile Include="NitEmu\NitEmu.c" />
     <ClCompile Include="NitEmu\IsdCommand.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="TwlDbg\TwlDbg.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="isd.h" />
@@ -204,6 +205,7 @@
     <ClInclude Include="NitEmu\NitEmu.h" />
     <ClInclude Include="NitEmu\IsdCommand.h" />
     <ClInclude Include="NitEmu\NitEmuPrivate.h" />
+    <ClInclude Include="TwlDbg\TwlDbg.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
