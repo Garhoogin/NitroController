@@ -97,13 +97,6 @@ IsdDevice *IsdOpen_NitEmuInternal(const wchar_t *devPath, IsdShareMode shareMode
 	//checking our device handles opened correctly
 	if (pDev->hMutex == NULL) goto Error;
 
-	//checking the USB device descriptor
-	ISUsbDeviceDescriptor desc;
-	if (!ISUsbDeviceGetDeviceDescriptor(&pDev->usb, &desc)) goto Error;
-
-	//checking the USB device descriptor
-	if (desc.idVendor != ISUSB_VENDOR_INTSYS || desc.idProduct != ISD_PID_IS_NITRO_EMULATOR) goto Error;
-
 	return pDev;
 
 Error:
