@@ -22,9 +22,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 // -----------------------------------------------------------------------------------------------
+#include <initguid.h>
 #include <Windows.h>
+#include <SetupAPI.h>
 
 #include "IsUsb.h"
+#include "IsUsbPrivate.h"
 
 
 
@@ -73,6 +76,17 @@ Error:
 	return 0;
 }
 
+int ISUsbDeviceOpenDrvOnly(ISUsbDevice *pDev, const wchar_t *path) {
+	//other handles invalid
+	pDev->hRead  = INVALID_HANDLE_VALUE;
+	pDev->hWrite = INVALID_HANDLE_VALUE;
+
+	pDev->hDev = CreateFile(path, GENERIC_READ | GENERIC_WRITE,
+		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+
+	return pDev->hDev != INVALID_HANDLE_VALUE;
+}
+
 int ISUsbDeviceClose(ISUsbDevice *pDev) {
 	if (pDev->hDev   != INVALID_HANDLE_VALUE) CloseHandle(pDev->hDev  );
 	if (pDev->hRead  != INVALID_HANDLE_VALUE) CloseHandle(pDev->hRead );
@@ -86,7 +100,7 @@ int ISUsbDeviceClose(ISUsbDevice *pDev) {
 	return 1;
 }
 
-int ISUsbDeviceWrite(ISUsbDevice *pDev, const void *buf, size_t size) {
+int ISUsbDeviceWrite(ISUsbDevice *pDev, const void *buf, unsigned int size) {
 	while (size > 0) {
 		unsigned int nChunk = size;
 		if (nChunk > ISUSB_WRITE_MAX) nChunk = ISUSB_WRITE_MAX;
@@ -107,7 +121,7 @@ int ISUsbDeviceWrite(ISUsbDevice *pDev, const void *buf, size_t size) {
 	return 1;  // success
 }
 
-int ISUsbDeviceRead(ISUsbDevice *pDev, void *buf, size_t size) {
+int ISUsbDeviceRead(ISUsbDevice *pDev, void *buf, unsigned int size) {
 	while (size > 0) {
 		unsigned int nChunk = size;
 		if (nChunk > ISUSB_READ_MAX) nChunk = ISUSB_READ_MAX;
@@ -141,4 +155,84 @@ int ISUsbDeviceGetDeviceDescriptor(ISUsbDevice *pDev, ISUsbDeviceDescriptor *pDe
 
 	memcpy(pDesc, &desc, sizeof(desc));
 	return 1;
+}
+
+
+
+static int ISUsbDeviceListAdd(ISUsbDeviceList *pList, const wchar_t *path, uint16_t vid, uint16_t pid) {
+	ISUsbDeviceListEntry *newbuf = realloc(pList->devs, (pList->nDev + 1) * sizeof(ISUsbDeviceListEntry));
+	if (newbuf == NULL) return 0;
+
+	pList->devs = newbuf;
+	pList->nDev++;
+
+	ISUsbDeviceListEntry *pEnt = &pList->devs[pList->nDev - 1];
+	pEnt->path = _wcsdup(path);
+	pEnt->vid = vid;
+	pEnt->pid = pid;
+
+	return 1;
+}
+
+int ISUsbFindDevices(ISUsbDeviceList *pList, uint16_t vid, uint16_t pid) {
+	SP_DEVICE_INTERFACE_DATA deviceInterfaceData = { 0 };
+	SP_DEVICE_INTERFACE_DETAIL_DATA *pDetail = NULL;
+	DWORD requiredSize = 0, memberIndex = 0;
+
+	//init list
+	pList->devs = NULL;
+	pList->nDev = 0;
+
+	//find devices
+	HDEVINFO hDevInfo = SetupDiGetClassDevs(&ISUSB_INTERFACE_GUID, NULL, NULL, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
+	if (hDevInfo == INVALID_HANDLE_VALUE) goto Error;
+
+	while (1) {
+		deviceInterfaceData.cbSize = sizeof(deviceInterfaceData);
+		if (!SetupDiEnumDeviceInterfaces(hDevInfo, NULL, &ISUSB_INTERFACE_GUID,
+			memberIndex++, &deviceInterfaceData)) break;
+
+		//query required size
+		if (!SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, NULL, 0, &requiredSize, NULL)) {
+			if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) break;
+		}
+
+		free(pDetail); // free old detail
+		pDetail = (SP_DEVICE_INTERFACE_DETAIL_DATA *) calloc(1, requiredSize);
+		if (pDetail == NULL) break;
+
+		//real query
+		pDetail->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+		if (!SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, pDetail,
+			requiredSize, &requiredSize, NULL)) continue;
+
+		//query device
+		ISUsbDevice dev;
+		if (!ISUsbDeviceOpenDrvOnly(&dev, pDetail->DevicePath)) continue;
+
+		//check matching product
+		ISUsbDeviceDescriptor desc;
+		if (ISUsbDeviceGetDeviceDescriptor(&dev, &desc)) {
+			if (desc.idVendor == vid && desc.idProduct == pid) {
+				//match
+				ISUsbDeviceListAdd(pList, pDetail->DevicePath, vid, pid);
+			}
+		}
+
+		ISUsbDeviceClose(&dev);
+	}
+
+	SetupDiDestroyDeviceInfoList(hDevInfo);
+	free(pDetail);
+
+	return 1;
+
+Error:
+	return 0;
+}
+
+void ISUsbDeviceListFree(ISUsbDeviceList *pList) {
+	free(pList->devs);
+	pList->devs = NULL;
+	pList->nDev = 0;
 }

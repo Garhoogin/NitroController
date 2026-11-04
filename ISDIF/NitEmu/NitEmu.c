@@ -22,9 +22,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 // -----------------------------------------------------------------------------------------------
-#include <initguid.h>
 #include <Windows.h>
-#include <SetupAPI.h>
 
 #include "isd.h"
 #include "IsdPrivate.h"
@@ -116,38 +114,19 @@ Error:
 IsdDevice *IsdOpen_NitEmu(const wchar_t *devPath, IsdShareMode shareMode) {
 	if (devPath != NULL) return IsdOpen_NitEmuInternal(devPath, shareMode);
 
-	SP_DEVICE_INTERFACE_DATA deviceInterfaceData = { 0 };
-	SP_DEVICE_INTERFACE_DETAIL_DATA *pDetail = NULL;
-	DWORD requiredSize = 0, memberIndex = 0;
+	//find device
+	ISUsbDeviceList list;
+	if (!ISUsbFindDevices(&list, ISUSB_VENDOR_INTSYS, ISD_PID_IS_NITRO_EMULATOR)) return NULL;
+
 	IsdDevice *pDev = NULL;
 
-	HDEVINFO hDevInfo = SetupDiGetClassDevs(&ISUSB_INTERFACE_GUID, NULL, NULL, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
-	if (hDevInfo == INVALID_HANDLE_VALUE) return NULL;
-
-	while (pDev == NULL) {
-		deviceInterfaceData.cbSize = sizeof(deviceInterfaceData);
-		if (!SetupDiEnumDeviceInterfaces(hDevInfo, NULL, &ISUSB_INTERFACE_GUID, memberIndex++, &deviceInterfaceData)) break;
-
-		//query required size
-		if (!SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, NULL, 0, &requiredSize, NULL)) {
-			if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) break;
-		}
-
-		free(pDetail); // free old detail
-		pDetail = (SP_DEVICE_INTERFACE_DETAIL_DATA *) calloc(1, requiredSize);
-		if (pDetail == NULL) break;
-
-		pDetail->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
-
-		//real query
-		if (!SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, pDetail, requiredSize, &requiredSize, NULL)) break;
-
-		//try open
-		pDev = IsdOpen_NitEmuInternal(pDetail->DevicePath, shareMode);
+	//use first device in the list
+	//TODO: a more sophisticated interface to select the device
+	if (list.nDev > 0) {
+		pDev = IsdOpen_NitEmuInternal(list.devs[0].path, shareMode);
 	}
 
-	if (hDevInfo != INVALID_HANDLE_VALUE) SetupDiDestroyDeviceInfoList(hDevInfo);
-	free(pDetail);
+	ISUsbDeviceListFree(&list);
 	return pDev;
 }
 
