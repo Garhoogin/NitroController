@@ -29,51 +29,53 @@
 
 // ----- command code
 
-#define ISDCMD_CMDCODE_MASK    0x0000007F  // command code mask
-#define ISDCMD_TARGET_MASK     0x00000080  // Command target mask
-#define ISDCMD_RDTYPE_MASK     0x000F0000  // operation type mask
-#define ISDCMD_LOC_MASK        0xFF000000  // The type of location accessed
-#define ISDCMD_TARGET_NTR      0x00000080  // Command target -> NITRO
-#define ISDCMD_TARGET_NEC      0x00000000  // Command target -> NEC
-#define ISDCMD_TYPE_WR         0x00000000  // Command type -> write
-#define ISDCMD_TYPE_RD         0x00010000  // Command type -> read
-#define ISDCMD_TYPE_UD         0x00020000  // Command type -> other (?)
-#define ISDCMD_FLAG_NOSTAT     0x00100000  // Setting this rejects the command return code
-#define ISDCMD_LOC_CMD         0x00000000  // not a real location, used to send commands
-#define ISDCMD_LOC_SDRAM       0x01000000  // access emulation memory
-#define ISDCMD_LOC_AGB         0x02000000  // access AGB SRAM
-#define ISDCMD_LOC_3           0x03000000  // ?
-#define ISDCMD_LOC_AGBBUS1     0x04000000  // ?
-#define ISDCMD_LOC_AGBBUS2     0x05000000  // ?
+#define ISDCMD_CMDCODE_MASK     0x0000007F  // command code mask
+#define ISDCMD_TARGET_MASK      0x00000080  // Command target mask
+#define ISDCMD_RDTYPE_MASK      0x000F0000  // operation type mask
+#define ISDCMD_LOC_MASK         0xFF000000  // The type of location accessed
+#define ISDCMD_TARGET_NTR       0x00000080  // Command target -> NITRO
+#define ISDCMD_TARGET_NEC       0x00000000  // Command target -> NEC
+#define ISDCMD_TYPE_WR          0x00000000  // Command type -> write
+#define ISDCMD_TYPE_RD          0x00010000  // Command type -> read
+#define ISDCMD_TYPE_UD          0x00020000  // Command type -> other (?)
+#define ISDCMD_FLAG_NOSTAT      0x00100000  // Setting this rejects the command return code
+#define ISDCMD_LOC_CMD          0x00000000  // not a real location, used to send commands
+#define ISDCMD_LOC_SDRAM        0x01000000  // access emulation memory
+#define ISDCMD_LOC_AGB          0x02000000  // access AGB SRAM
+#define ISDCMD_LOC_3            0x03000000  // ?
+#define ISDCMD_LOC_AGBBUS1      0x04000000  // ?
+#define ISDCMD_LOC_AGBBUS2      0x05000000  // ?
 
-#define ISDCMD_READ_SDRAM      (ISDCMD_LOC_SDRAM | ISDCMD_TYPE_RD)                               // read emulation memory
-#define ISDCMD_READ_AGB        (ISDCMD_LOC_AGB   | ISDCMD_TYPE_RD)                               // read AGB SRAM
+#define ISDCMD_READ_SDRAM       (ISDCMD_LOC_SDRAM | ISDCMD_TYPE_RD)                               // read emulation memory
+#define ISDCMD_READ_AGB         (ISDCMD_LOC_AGB   | ISDCMD_TYPE_RD)                               // read AGB SRAM
 
-#define ISDCMD_WRITE_SDRAM     (ISDCMD_LOC_SDRAM | ISDCMD_TYPE_WR)                               // write emulation memory
-#define ISDCMD_WRITE_AGB       (ISDCMD_LOC_AGB   | ISDCMD_TYPE_WR)                               // write AGB SRAM
+#define ISDCMD_WRITE_SDRAM      (ISDCMD_LOC_SDRAM | ISDCMD_TYPE_WR)                               // write emulation memory
+#define ISDCMD_WRITE_AGB        (ISDCMD_LOC_AGB   | ISDCMD_TYPE_WR)                               // write AGB SRAM
 
-#define ISDCMD_GET_SERIAL      (ISDCMD_TARGET_NEC | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x13)  // get device serial
-#define ISDCMD_GET_FIRM_INFO   (ISDCMD_TARGET_NEC | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x18)  // get firmware info
+#define ISDCMD_GET_SERIAL       (ISDCMD_TARGET_NEC | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x13)  // get device serial
+#define ISDCMD_GET_FIRM_INFO    (ISDCMD_TARGET_NEC | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x18)  // get firmware info
 
-#define ISDCMD_HARDWARE_RESET  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x01)  // do hardware reset (byte=1: flush print?)
-#define ISDCMD_START_READ_MEM  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x03)  // read memory from target processor
-#define ISDCMD_WRITE_MEM       (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x04)  // write memory to target processor
-#define ISDCMD_FIQ_LEAVE       (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x05)  // allow FIQ to return
-#define ISDCMD_SET_RST         (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x0A)  // set reset
-#define ISDCMD_SELECT_PROC     (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x0B)  // set current processor
-#define ISDCMD_START_READ_REG  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x20)  // read register from target processor
-#define ISDCMD_SET_FIQ         (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x2A)  // set FIQ raise/lower
-#define ISDCMD_CONFIGURE       (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x2D)  // configure setting on NEC
-#define ISDCMD_RW_ICE_REG      (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x33)  // read/write ICE register
+#define ISDCMD_HARDWARE_RESET   (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x01)  // do hardware reset (byte=1: flush print?)
+#define ISDCMD_START_READ_MEM   (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x03)  // read memory from target processor
+#define ISDCMD_WRITE_MEM        (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x04)  // write memory to target processor
+#define ISDCMD_FIQ_LEAVE        (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x05)  // allow FIQ to return
+#define ISDCMD_SET_RST          (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x0A)  // set reset
+#define ISDCMD_SELECT_PROC      (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x0B)  // set current processor
+#define ISDCMD_START_READ_REG   (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x20)  // read register from target processor
+#define ISDCMD_START_READ_MONR  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x28)  // read FIQ enter reason
+#define ISDCMD_SET_FIQ          (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x2A)  // set FIQ raise/lower
+#define ISDCMD_CONFIGURE        (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x2D)  // configure setting on NEC
+#define ISDCMD_RW_ICE_REG       (ISDCMD_TARGET_NTR | ISDCMD_TYPE_WR | ISDCMD_FLAG_NOSTAT | 0x33)  // read/write ICE register
 
-#define ISDCMD_READ_MEM_RESULT (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x01)  // get read memory result
-#define ISDCMD_GET_PRINT_MAINP (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x08)  // get print data ARM9
-#define ISDCMD_GET_PRINT_SUBP  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x09)  // get print data ARM7
-#define ISDCMD_GET_MON_STATUS  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x0B)  // checks monitor status (no poll)
-#define NECCDM_READ_REG_RESULT (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x0C)  // read regs read result
-#define ISDCMD_GET_ICE_WSTAT   (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x18)  // get ICE write status
-#define ISDCMD_WAITMON_FIQ     (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x27)  // wait for FIQ entry
-#define ISDCMD_WAITMON_CMD     (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x28)  // wait for command complete
+#define ISDCMD_READ_MEM_RESULT  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x01)  // get read memory result
+#define ISDCMD_GET_PRINT_MAINP  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x08)  // get print data ARM9
+#define ISDCMD_GET_PRINT_SUBP   (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x09)  // get print data ARM7
+#define ISDCMD_GET_MON_STATUS   (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x0B)  // checks monitor status (no poll)
+#define NECCDM_READ_REG_RESULT  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x0C)  // read regs read result
+#define ISDCMD_READ_MON_REASON  (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x10)  // get FIQ enter reason result
+#define ISDCMD_GET_ICE_WSTAT    (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x18)  // get ICE write status
+#define ISDCMD_WAITMON_FIQ      (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x27)  // wait for FIQ entry
+#define ISDCMD_WAITMON_CMD      (ISDCMD_TARGET_NTR | ISDCMD_TYPE_RD | ISDCMD_FLAG_NOSTAT | 0x28)  // wait for command complete
 
 
 
@@ -87,6 +89,11 @@
 #define ISD_CFG_CARD_POWER     0x0A  // Nitro card power setting
 #define ISD_CFG_CARD_EJECT     0x0D  // Nitro card ejection
 #define ISD_CFG_DBG_BUTTON     0x1D  // debug button simulation
+
+#define ISD_MON_REASON_MASK    0x03  // monitor entry reason mask
+#define ISD_MON_REASON_FIQ     0x00  // monitor entry because of FIQ
+#define ISD_MON_REASON_ABT     0x02  // monitor entry because of abort
+#define ISD_MON_REASON_UDF     0x03  // monitor entry because of undefined instruction
 
 
 
@@ -132,6 +139,11 @@ typedef struct IsdCmdWriteMemBody_ {
 	unsigned char data[];
 } IsdCmdWriteMemBody;
 
+typedef struct IsdCmdReadMonReasonBody_ {
+	uint8_t cmdid;
+	uint8_t field1;
+} IsdCmdReadMonReasonBody;
+
 typedef struct IsdCmdConfigureBody_ {
 	uint8_t cmdid;
 	uint32_t id;
@@ -164,6 +176,11 @@ typedef struct IsdCmdWriteMem_ {
 	IsdCommandHeader   header;
 	IsdCmdWriteMemBody body;
 } IsdCmdWriteMem;
+
+typedef struct IsdCmdReadMonReason_ {
+	IsdCommandHeader        header;
+	IsdCmdReadMonReasonBody body;
+} IsdCmdReadMonReason;
 
 typedef struct IsdCmdConfigure_ {
 	IsdCommandHeader    header;
@@ -211,6 +228,26 @@ typedef struct IsdMonStatusBlock_ {
 	uint32_t monStatus;             // ? (0=in process, 1=complete, 2=unknown?)
 } IsdMonStatusBlock;
 
+// -----------------------------------------------------------------------------------------------
+// Name: struct IsdMonReasonBlock
+//
+// Reports the reason for entry of the monitor routine.
+//
+// Values:
+//   size                        Size of this data (12 bytes)
+//   field4                      ? (Debug monitor timestamp?)
+//   monReason                   The low 2 bits indicate the reason for the monitor entry.
+//                                 0: By FIQ
+//                                 2: By ABT
+//                                 3: By UDF
+//                               Bit4: always clear on subprocessor.
+// -----------------------------------------------------------------------------------------------
+typedef struct IsdMonReasonBlock_ {
+	uint32_t size;                  // size of data
+	uint32_t field4;                // debug monitor timestamp?
+	uint32_t monReason;             // monitor entry reason
+} IsdMonReasonBlock;
+
 
 // ----- Command procedures
 
@@ -234,4 +271,6 @@ int IsdCmdSend_FiqLeave(IsdDevice *pDev);
 int IsdCmdSend_WriteMem(IsdDevice *pDev, uint32_t dest, const void *buf, unsigned int size);
 int IsdCmdSend_StartReadMem(IsdDevice *pDev, uint32_t addr, unsigned int size);
 int IsdCmdSend_GetReadMemResult(IsdDevice *pDev, void *dest, unsigned int size);
+int IsdCmdSend_StartReadMonReason(IsdDevice *pDev);
+int IsdCmdSend_GetReadMonReasonResult(IsdDevice *pDev, IsdMonReasonBlock *pReason);
 int IsdCmdSend_Configure(IsdDevice *pDev, int idx, const void *data, unsigned int size);

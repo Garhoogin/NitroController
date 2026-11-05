@@ -227,10 +227,26 @@ int IsdCmdSend_GetReadMemResult(IsdDevice *pDev, void *dest, unsigned int size) 
 	return IsdSendReadCommand(pDev, &cmd, dest);
 }
 
+int IsdCmdSend_StartReadMonReason(IsdDevice *pDev) {
+	IsdCmdReadMonReason cmd = { 0 };
+	ISD_INIT_CMD(cmd, ISDCMD_READ_MON_REASON);
+
+	return IsdSendWriteCommand(pDev, &cmd);
+}
+
+int IsdCmdSend_GetReadMonReasonResult(IsdDevice *pDev, IsdMonReasonBlock *pReason) {
+	IsdCommandHeader cmd = { 0 };
+	ISD_INIT_CMD_HDR(cmd, ISDCMD_READ_MON_REASON);
+	
+	cmd.size = sizeof(IsdMonReasonBlock);
+	return IsdSendReadCommand(pDev, &cmd, pReason);
+}
+
 int IsdCmdSend_Configure(IsdDevice *pDev, int idx, const void *data, unsigned int size) {
 	IsdCmdConfigure cmd = { 0 };
 	ISD_INIT_CMD(cmd, ISDCMD_CONFIGURE);
 
+	cmd.body.id = idx;
 	memcpy(cmd.body.data, data, size);
 	return IsdSendWriteCommand(pDev, &cmd);
 }
